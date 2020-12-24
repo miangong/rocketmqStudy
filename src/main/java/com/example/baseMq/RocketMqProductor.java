@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.baseMq;
 
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;

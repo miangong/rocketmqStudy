@@ -1,4 +1,4 @@
-package com.example.sx;
+package com.example.orderMq;
 
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;

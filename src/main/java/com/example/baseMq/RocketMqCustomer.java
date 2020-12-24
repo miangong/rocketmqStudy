@@ -1,5 +1,6 @@
-package com.example.demo;
+package com.example.baseMq;
 
+import com.example.demo.RocketmqstudyApplication;
 import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
@@ -9,6 +10,7 @@ import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.common.protocol.heartbeat.MessageModel;
 
+import javax.annotation.security.RunAs;
 import java.util.List;
 
 /**

@@ -1,4 +1,4 @@
-package com.example.sx;
+package com.example.orderMq;
 
 /**
  * Description： TODO
