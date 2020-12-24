@@ -1,12 +1,10 @@
-package com.example.demo;
+package com.example.sx;
 
-import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
-import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.MessageQueueSelector;
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageQueue;
-import sun.plugin2.message.Message;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,58 +16,33 @@ import java.util.List;
  * <p>
  * Author: miangong
  * <p>
- * Date: Created in 2020/12/22 16:30
+ * Date: Created in 2020/12/24 13:43
  */
-public class SxRocketMqProductor {
+public class SxRocketMqProductorSec {
 
-    public static void main(String[] args) throws MQClientException {
-        sendSxMessage();
-    }
-
-    private static void sendSxMessage() throws MQClientException {
+    public static void main(String[] args) throws Exception {
         DefaultMQProducer producer = new DefaultMQProducer("please_rename_unique_group_name");
-        producer.setNamesrvAddr("127.0.0.1:9876");
+        producer.setNamesrvAddr("123.56.248.199:9876");
+        producer.setSendMsgTimeout(6000);
         producer.start();
-        String[] tags = new String[]{"TagA", "TagC", "TagD"};
-        // 订单列表
-        List<OrderStep> orderList = new SxRocketMqProductor().buildOrders();
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String dateStr = sdf.format(date);
+        String[] tags = {"TagA", "TagB", "TagC"};
+        List<OrderStep> list = new SxRocketMqProductorSec().buildOrders();
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         for (int i = 0; i < 10; i++) {
-            // 加个时间前缀
-            String body = dateStr + " Hello RocketMQ " + orderList.get(i);
-//            Message topic = new Message("Topic", tags[i % tags.length], "KEY" + i, body.getBytes());
-
+            String body = date + "helloRocket" + list.get(i);
+            byte[] bytes = body.getBytes();
+            Message mess = new Message("Topic", tags[i % tags.length], "key" + i, bytes);
+            SendResult sendResult = producer.send(mess, new MessageQueueSelector() {
+                @Override
+                public MessageQueue select(List<MessageQueue> list, Message message, Object o) {
+                    Long id = (Long) o;
+                    long index = id % list.size();
+                    return list.get((int) index);
+                }
+            }, list.get(i).getOrderId());
+            System.out.println(String.format("SendResult status:%s, queueId:%d, body:%s", sendResult.getSendStatus(), sendResult.getMessageQueue().getQueueId(), body));
         }
-    }
-
-    /*** 订单的步骤 */
-    private static class OrderStep {
-        private long orderId;
-        private String desc;
-
-        public long getOrderId() {
-            return orderId;
-        }
-
-        public void setOrderId(long orderId) {
-            this.orderId = orderId;
-        }
-
-        public String getDesc() {
-            return desc;
-        }
-
-        public void setDesc(String desc) {
-            this.desc = desc;
-        }
-
-        @Override
-        public String toString() {
-            return "OrderStep{" + "orderId=" + orderId + ", desc='" + desc + '\'' + '}';
-        }
-
+        producer.shutdown();
     }
 
 
@@ -118,5 +91,4 @@ public class SxRocketMqProductor {
         orderList.add(orderDemo);
         return orderList;
     }
-
 }
